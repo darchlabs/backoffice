@@ -32,6 +32,7 @@ func main() {
 
 	log.Println("Starting DarchLabs backoffice")
 	app, err := application.New(&application.Config{
+		Config:   conf,
 		SqlStore: sqlStore,
 	})
 	check(err)
