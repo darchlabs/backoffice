@@ -52,8 +52,6 @@ func (s *Server) Start(app *application.App) error {
 		v1.HealthRoute(ctx)
 		user.Route("/api/v1/users", ctx)
 
-		// proxy requests for node
-
 		// sever listen
 		log.Println("[API] server running")
 		err := s.server.Listen(fmt.Sprintf(":%s", s.port))

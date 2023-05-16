@@ -4,16 +4,11 @@ import (
 	"time"
 
 	"github.com/darchlabs/backoffice/internal/api/context"
-	"github.com/darchlabs/backoffice/internal/storage"
 	userdb "github.com/darchlabs/backoffice/internal/storage/user"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
-
-type userInsertQuery func(storage.QueryContext, *userdb.Record) error
-
-type idGenerate func() string
 
 type PostSignupHandler struct {
 	idGenerate      idGenerate

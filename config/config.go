@@ -2,6 +2,7 @@ package config
 
 type Config struct {
 	Environment string `envconfig:"environment" required:"true"`
+	SecretKey   string `envconfig:"environment" required:"true"`
 
 	// Server config
 	ApiServerPort string `envconfig:"api_server_port" required:"true"`
