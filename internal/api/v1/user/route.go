@@ -23,7 +23,14 @@ func Route(basePath string, ctx *context.Ctx) {
 		authUpsertQuery:        authdb.UpsertQuery,
 	}
 
+	postValidTokenHandler := &PostValidTokenHandler{
+		secretKey:              ctx.App.Config.SecretKey,
+		authSelectByTokenQuery: authdb.SelectByTokenQuery,
+		userSelectByEmailQuery: userdb.SelectByEmailQuery,
+	}
+
 	// route
 	ctx.Server.Post(fmt.Sprintf("%s/signup", basePath), v1.HandleFunc(ctx, postSignupHandler.Invoke))
 	ctx.Server.Post(fmt.Sprintf("%s/login", basePath), v1.HandleFunc(ctx, postLoginHandler.Invoke))
+	ctx.Server.Post(fmt.Sprintf("%s/tokens", basePath), v1.HandleFunc(ctx, postValidTokenHandler.Invoke))
 }

@@ -6,7 +6,6 @@ import (
 
 	"github.com/darchlabs/backoffice/internal/api/context"
 	"github.com/darchlabs/backoffice/internal/storage/auth"
-	"github.com/darchlabs/backoffice/internal/storage/user"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"github.com/pkg/errors"
@@ -51,9 +50,7 @@ func (h *PostLoginHandler) Invoke(ctx *context.Ctx, c *fiber.Ctx) (interface{}, 
 }
 
 func (h *PostLoginHandler) invoke(ctx *context.Ctx, req *postLoginHandlerRequest) (interface{}, int, error) {
-	user, err := h.userSelectByEmailQuery(ctx.SqlStore, &user.SelectByEmailQueryData{
-		Email: req.Email,
-	})
+	user, err := h.userSelectByEmailQuery(ctx.SqlStore, req.Email)
 	if err != nil {
 		return nil, fiber.StatusInternalServerError, errors.Wrap(err, "user: PostLoginHandler.invoke h.userSelectByEmailAndPwdQuery error")
 	}
