@@ -5,17 +5,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-type SelectByEmailQueryData struct {
-	Email string
-}
-
-func SelectByEmailQuery(tx storage.Transaction, data *SelectByEmailQueryData) (*Record, error) {
+func SelectByEmailQuery(tx storage.Transaction, email string) (*Record, error) {
 	var record Record
 	err := tx.Get(&record, `
 		SELECT *
 		FROM users
 		WHERE email = $1;`,
-		data.Email,
+		email,
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "user: SelectByEmailQuery tx.Get error")
