@@ -30,12 +30,16 @@ compose-down:
 
 build-local:
 	@echo "[build darchlabs/backoffice local]"
-	@go build -o bin/backoffice/backoffice cmd/backoffice/main.go
+	@go build -o bin/backoffice/backoffice cmd/server/main.go
 	@echo "Build darchlabs-backoffice done ✔︎"
 
 dev:
-	@echo "[run backoffice local]"
+	@echo "[run backoffice dev local]"
 	@export $$(cat backoffice.env) && nodemon --exec go run cmd/server/main.go
+
+run:
+	@echo "[run backoffice local]"
+	@export $$(cat backoffice.env) && go run cmd/server/main.go
 
 docker-login:
 	@echo "[docker] Login to docker..."
