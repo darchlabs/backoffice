@@ -18,7 +18,6 @@ func main() {
 	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Impkb2VAZ21haWwuY29tIiwiZXhwIjoxNzE1ODQxNDA5fQ.DWAF9i07IgdnhZoyXHUsFQMzJ-6Hzz_-rD6rprpbCeo"
 
 	res, err := cl.ValidToken(token)
-	fmt.Println("----- error", err)
 	check(err)
 
 	fmt.Printf("%+v\n", res)

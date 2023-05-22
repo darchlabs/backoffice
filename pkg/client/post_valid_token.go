@@ -50,14 +50,11 @@ func (cl *Client) ValidTokenWithCtx(ctx context.Context, token string) (*ValidTo
 	if err != nil {
 		return nil, errors.Wrap(err, "client: Client.ValidTokenWithCtx cl.client.Do error")
 	}
-	fmt.Println("~~~~~~~~>> status code", res.StatusCode)
 	if res.StatusCode != http.StatusOK {
-		fmt.Println("~~~~~~~~>> entró ctm")
 		return nil, errors.New(
 			fmt.Sprintf("client: Client.ValidTokenWithCtx request rejected with status %d", res.StatusCode),
 		)
 	}
-	fmt.Println("~~~~~~~~>> paso cagando")
 
 	var response ValidTokenResponse
 
