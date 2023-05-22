@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/darchlabs/backoffice/internal/api/context"
@@ -72,10 +71,6 @@ func (h *PostLoginHandler) invoke(ctx *context.Ctx, req *postLoginHandlerRequest
 	if err != nil {
 		return nil, fiber.StatusInternalServerError, errors.Wrap(err, "auth: PostLoginHandler.invoke token.SignedString error")
 	}
-
-	fmt.Println("----------- sqlstore", ctx.SqlStore)
-	fmt.Println("----------- h.authUpsertQuery", h.authUpsertQuery)
-	fmt.Println("----------- user", user)
 
 	err = h.authUpsertQuery(ctx.SqlStore, &auth.Record{
 		UserID:    user.ID,

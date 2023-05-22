@@ -16,6 +16,7 @@ func Test_PostSignupHandler_Invoke(t *testing.T) {
 		inputReq            *postSignupHandlerRequest
 		expectedErrMsg      string
 		expectedStatus      int
+		idGenerate          idGenerate
 		userInsertQueryFunc userInsertQuery
 	}{
 		{
@@ -25,6 +26,7 @@ func Test_PostSignupHandler_Invoke(t *testing.T) {
 				Name:     "jon doe",
 				Password: "securePassword",
 			},
+			idGenerate:     func() string { return "test-id" },
 			expectedStatus: fiber.StatusCreated,
 			userInsertQueryFunc: func(_ storage.QueryContext, _ *userdb.Record) error {
 				return nil
@@ -36,6 +38,7 @@ func Test_PostSignupHandler_Invoke(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			h := PostSignupHandler{
 				userInsertQuery: tc.userInsertQueryFunc,
+				idGenerate:      tc.idGenerate,
 			}
 
 			ctx := &context.Ctx{}
