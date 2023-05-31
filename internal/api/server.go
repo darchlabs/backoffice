@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/darchlabs/backoffice/internal/api/context"
@@ -47,13 +46,11 @@ func (s *Server) Start(app *application.App) error {
 			App:      s.app,
 			SqlStore: app.SqlStore,
 		})
-		log.Println("[API] context", ctx)
 		// route endpoints
 		v1.HealthRoute(ctx)
 		user.Route("/api/v1/users", ctx)
 
 		// sever listen
-		log.Println("[API] server running")
 		err := s.server.Listen(fmt.Sprintf(":%s", s.port))
 		if err != nil {
 			panic(err)

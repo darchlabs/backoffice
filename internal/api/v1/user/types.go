@@ -11,8 +11,10 @@ type idGenerate func() string
 
 type userInsertQuery func(storage.QueryContext, *userdb.Record) error
 
-type userSelectByEmailQuery func(storage.Transaction, *user.SelectByEmailQueryData) (*user.Record, error)
+type userSelectByEmailQuery func(storage.Transaction, string) (*user.Record, error)
 
 type authInsertQuery func(storage.QueryContext, *auth.Record) error
 
 type authUpsertQuery func(storage.QueryContext, *auth.Record) error
+
+type authSelectByTokenQuery func(storage.Transaction, string) (*auth.Record, error)
