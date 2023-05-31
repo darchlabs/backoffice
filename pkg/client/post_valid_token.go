@@ -15,6 +15,10 @@ var (
 	validTokenEndpoint = "/api/v1/users/tokens"
 )
 
+type ValidTokenRequest struct {
+	Token string `json:"token"`
+}
+
 type ValidTokenResponse struct {
 	UserID string `json:"user_id"`
 }
@@ -25,9 +29,7 @@ func (cl *Client) ValidToken(token string) (*ValidTokenResponse, error) {
 }
 
 func (cl *Client) ValidTokenWithCtx(ctx context.Context, token string) (*ValidTokenResponse, error) {
-	body := &struct {
-		Token string `json:"token"`
-	}{
+	body := &ValidTokenRequest{
 		Token: token,
 	}
 
