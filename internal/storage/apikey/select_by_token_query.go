@@ -1,4 +1,4 @@
-package auth
+package apikey
 
 import (
 	"database/sql"
@@ -8,14 +8,15 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("auth: token not found")
+	ErrNotFound = errors.New("apikey: apikey not found")
 )
 
 func SelectByTokenQuery(tx storage.Transaction, token string) (*Record, error) {
 	var record Record
+
 	err := tx.Get(&record, `
 		SELECT *
-		FROM auth
+		FROM api_keys
 		WHERE token = $1;`,
 		token,
 	)
@@ -23,7 +24,7 @@ func SelectByTokenQuery(tx storage.Transaction, token string) (*Record, error) {
 		return nil, ErrNotFound
 	}
 	if err != nil {
-		return nil, errors.Wrap(err, "auth: SelectByTokenQuery tx.Get error")
+		return nil, errors.Wrap(err, "apikey: SelectByEmailQuery tx.Get error")
 	}
 
 	return &record, nil
