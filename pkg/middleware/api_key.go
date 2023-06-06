@@ -1,34 +1,29 @@
 package middleware
 
 import (
-	"strings"
-
 	"github.com/darchlabs/backoffice/pkg/client"
 	"github.com/gofiber/fiber/v2"
 )
 
-type Auth struct {
+type ApiKey struct {
 	client *client.Client
 }
 
-func NewAuth(cl *client.Client) *Auth {
+func NewApiKey(cl *client.Client) *Auth {
 	return &Auth{client: cl}
 }
 
-func (a *Auth) Middleware(c *fiber.Ctx) error {
+func (a *ApiKey) Middleware(c *fiber.Ctx) error {
 	// Extract the Authorization header
-	authHeader := c.Get("Authorization")
+	apiKey := c.Get("X-Api-Key")
 
 	// Check if the Authorization header is present and in the correct format
-	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+	if apiKey == "" {
 		return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized")
 	}
 
-	// Extract the token from the Authorization header
-	token := strings.TrimPrefix(authHeader, "Bearer ")
-
 	// Call the ValidTokenWithCtx function to validate the token and get the user ID
-	response, err := a.client.ValidTokenWithCtx(c.Context(), token)
+	response, err := a.client.ValidApiKeyWithCtx(c.Context(), apiKey)
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized")
 	}

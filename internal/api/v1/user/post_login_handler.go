@@ -4,7 +4,8 @@ import (
 	"time"
 
 	"github.com/darchlabs/backoffice/internal/api/context"
-	"github.com/darchlabs/backoffice/internal/storage/auth"
+	authdb "github.com/darchlabs/backoffice/internal/storage/auth"
+	userdb "github.com/darchlabs/backoffice/internal/storage/user"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"github.com/pkg/errors"
@@ -26,7 +27,7 @@ type postLoginHandlerResponse struct {
 	Token string `json:"token"`
 }
 
-type customClaims struct {
+type loginClaims struct {
 	Email string `json:"email"`
 	jwt.StandardClaims
 }
@@ -50,6 +51,9 @@ func (h *PostLoginHandler) Invoke(ctx *context.Ctx, c *fiber.Ctx) (interface{}, 
 
 func (h *PostLoginHandler) invoke(ctx *context.Ctx, req *postLoginHandlerRequest) (interface{}, int, error) {
 	user, err := h.userSelectByEmailQuery(ctx.SqlStore, req.Email)
+	if errors.Is(err, userdb.ErrNotFound) {
+		return nil, fiber.StatusNotFound, nil
+	}
 	if err != nil {
 		return nil, fiber.StatusInternalServerError, errors.Wrap(err, "user: PostLoginHandler.invoke h.userSelectByEmailAndPwdQuery error")
 	}
@@ -59,10 +63,11 @@ func (h *PostLoginHandler) invoke(ctx *context.Ctx, req *postLoginHandlerRequest
 		return nil, fiber.StatusUnauthorized, errors.Wrap(err, "user: PostLoginHandler.invoke bcrypt.CompareHashAndPassword error")
 	}
 
-	claims := customClaims{
+	// TODO: use better token valid interval
+	claims := loginClaims{
 		Email: req.Email,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(24 * 365 * time.Hour).Unix(), // TODO: use better token valid interval
+			ExpiresAt: time.Now().Add(24 * 365 * time.Hour).Unix(),
 		},
 	}
 
@@ -72,11 +77,11 @@ func (h *PostLoginHandler) invoke(ctx *context.Ctx, req *postLoginHandlerRequest
 		return nil, fiber.StatusInternalServerError, errors.Wrap(err, "auth: PostLoginHandler.invoke token.SignedString error")
 	}
 
-	err = h.authUpsertQuery(ctx.SqlStore, &auth.Record{
+	err = h.authUpsertQuery(ctx.SqlStore, &authdb.Record{
 		UserID:    user.ID,
 		Token:     signedToken,
 		Blacklist: false,
-		Kind:      auth.TokenKindUser,
+		Kind:      authdb.TokenKindUser,
 		CreatedAt: time.Now(),
 	})
 	if err != nil {
