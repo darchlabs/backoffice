@@ -29,5 +29,9 @@ func upCreateTableApiKeys(tx *sql.Tx) error {
 
 func downCreateTableApiKeys(tx *sql.Tx) error {
 	// This code is executed when the migration is rolled back.
+	_, err := tx.Exec(`DROP TABLE api_keys CASCADE;`)
+	if err != nil {
+		return err
+	}
 	return nil
 }
