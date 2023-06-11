@@ -1,6 +1,18 @@
 version: '3'
 
 services:
+  backoffice:
+    image: darchlabs/backoffice
+    depends_on:
+      - postgres
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./data/backoffice:/home/backoffice/data
+    env_file:
+      - ./backoffice.env
+
   postgres:
     image: postgres:13
     ports:
