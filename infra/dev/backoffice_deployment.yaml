@@ -1,0 +1,120 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-backoffice
+spec:
+  selector:
+    app: postgres-backoffice
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      name: "tcp"
+      port: 5432
+      targetPort: 5432
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-backoffice
+  template:
+    metadata:
+      labels:
+        app: postgres-backoffice
+    spec:
+      containers:
+        - name: postgres-backoffice
+          image: postgres:13
+          env:
+            - name: POSTGRES_DB
+              value: "postgres"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "postgres"
+            - name: PGSSLMODE
+              value: "disable"
+          ports:
+            - containerPort: 5432
+
+          volumeMounts:
+            - name: postgres-db-backoffice
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-db-backoffice
+          hostPath:
+            path: /mnt/data/postgres-db-backoffice
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backoffice
+spec:
+  selector:
+    app: backoffice
+  type: ClusterIP
+  ports:
+  - port: 9000
+    name: "http"
+    targetPort: 9000
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backoffice
+spec:
+  selector:
+    matchLabels:
+      app: backoffice
+  template:
+    metadata:
+      labels:
+        app: backoffice
+    spec:
+      volumes:
+        - name: backoffice-pvc
+          persistentVolumeClaim:
+            claimName: backoffice-pvc
+
+      containers:
+      - name: nodes
+        image: darchlabs/nodes:dev
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6969
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 9000
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 1
+          periodSeconds: 5
+        volumeMounts:
+          - name: backoffice-pvc
+            mountPath: /home/backoffice/data
+        env:
+          - name: ENVIRONMENT
+            value: "development"
+          - name: API_SERVER_PORT
+            value: "9000"
+          - name: DB_DRIVER
+            value: "postgres"
+          - name: DB_MMIGRATIONS_DIR
+            value: "migrations/"
+          - name: DB_DSN
+            value: "postgres://postgres:postgres@postgres-backoffice:5432/postgres?sslmode=disable"
+
+
