@@ -50,6 +50,13 @@ func (s *Server) Start(app *application.App) error {
 		v1.HealthRoute(ctx)
 		user.Route("/api/v1/users", ctx)
 
+		s.server.Get("/api/v1/health", v1.HandleFunc(
+			ctx,
+			func(_ *context.Ctx, _ *fiber.Ctx) (interface{}, int, error) {
+				return map[string]string{"status": "running"}, fiber.StatusOK, nil
+			},
+		))
+
 		// sever listen
 		err := s.server.Listen(fmt.Sprintf(":%s", s.port))
 		if err != nil {

@@ -17,7 +17,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-node
+  name: postgres-backoffice
 spec:
   replicas: 1
   selector:
@@ -86,11 +86,11 @@ spec:
             claimName: backoffice-pvc
 
       containers:
-      - name: nodes
-        image: darchlabs/nodes:dev
+      - name: backoffice
+        image: darchlabs/backoffice:0.0.2
         imagePullPolicy: Always
         ports:
-        - containerPort: 6969
+        - containerPort: 9000
         readinessProbe:
           httpGet:
             path: /api/v1/health
@@ -112,7 +112,7 @@ spec:
             value: "9000"
           - name: DB_DRIVER
             value: "postgres"
-          - name: DB_MMIGRATIONS_DIR
+          - name: DB_MIGRATIONS_DIR
             value: "migrations/"
           - name: DB_DSN
             value: "postgres://postgres:postgres@postgres-backoffice:5432/postgres?sslmode=disable"
